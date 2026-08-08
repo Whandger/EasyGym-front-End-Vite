@@ -10,13 +10,6 @@ interface Treino {
   exercicios: any[];
 }
 
-interface Recomendacao {
-  prioridade: "Alta" | "Média" | "Baixa";
-  problema: string;
-  recomendacao: string;
-  justificativa: string;
-}
-
 interface ExercicioResumo {
   nome: string;
   series: number;
@@ -54,7 +47,6 @@ interface RelatorioIA {
     dados_ausentes: string[];
   };
   evolucao: Evolucao[];
-  recomendacoes: Recomendacao[];
   sugestoes_exercicios: SugestaoExercicio[];
 }
 
@@ -63,16 +55,9 @@ const removerAcentos = (str: string): string => {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 };
 
-const CORES_PRIORIDADE: Record<Recomendacao["prioridade"], string> = {
-  Alta: "border-red-400 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300",
-  Média: "border-amber-400 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300",
-  Baixa: "border-gray-300 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300",
-};
-
 export default function IAOptimezeSection() {
   const [treinos, setTreinos] = useState<Treino[]>([]);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [objetivoSelecionado, setObjetivoSelecionado] = useState<string>("hipertrofia");
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [relatorio, setRelatorio] = useState<RelatorioIA | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -116,14 +101,8 @@ export default function IAOptimezeSection() {
     fetchTreinos();
   }, []);
 
-  const handleSelectAll = () => {
-    setSelectedIds(treinos.map((t) => t.id));
-  };
-
-  const handleToggle = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+  const handleSelectTreino = (id: number) => {
+    setSelectedId(prev => (prev === id ? null : id));
   };
 
   const renderTextoComLinks = (texto: string) => {
@@ -198,8 +177,8 @@ export default function IAOptimezeSection() {
   };
 
   const handleAnalisar = async () => {
-    if (selectedIds.length === 0) {
-      alert("Selecione pelo menos um treino.");
+    if (selectedId === null) {
+      alert("Selecione um treino.");
       return;
     }
 
@@ -209,8 +188,7 @@ export default function IAOptimezeSection() {
 
     try {
       const response = await api.post("/ai/dicas", {
-        treino_ids: selectedIds,
-        objetivo: objetivoSelecionado || undefined,
+        treino_ids: [selectedId],
       });
       if (response && typeof response === "object" && "dica" in response) {
         setRelatorio(response.dica as RelatorioIA);
@@ -224,8 +202,8 @@ export default function IAOptimezeSection() {
     }
   };
 
-  const selectedTreinos = treinos.filter((t) => selectedIds.includes(t.id));
-  const selectedNomes = selectedTreinos.map((t) => t.nome).join(", ");
+  const selectedTreino = treinos.find(t => t.id === selectedId);
+  const selectedNome = selectedTreino?.nome || "";
 
   return (
     <div className="p-4 space-y-6">
@@ -241,7 +219,7 @@ export default function IAOptimezeSection() {
             Consultoria IA
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Selecione os treinos e receba uma análise inteligente
+            Selecione um treino e receba uma análise inteligente
           </p>
         </div>
       </div>
@@ -251,47 +229,16 @@ export default function IAOptimezeSection() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-              {selectedIds.length === 0
+              {selectedId === null
                 ? "Nenhum treino selecionado"
-                : `${selectedIds.length} treino(s) selecionado(s)`}
+                : `Treino selecionado: ${selectedNome}`}
             </span>
-            {selectedIds.length > 0 && (
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                {selectedNomes}
-              </p>
-            )}
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={handleSelectAll}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
-            >
-              <span className="material-icons text-sm">select_all</span>
-              Selecionar todos
-            </button>
-          </div>
-        </div>
-
-        {/* Seletor de objetivo */}
-        <div className="flex items-center gap-2">
-          <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
-            Objetivo:
-          </label>
-          <select
-            value={objetivoSelecionado}
-            onChange={(e) => setObjetivoSelecionado(e.target.value)}
-            className="text-sm rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="hipertrofia">Hipertrofia</option>
-            <option value="forca_maxima">Força máxima</option>
-            <option value="potencia">Potência</option>
-            <option value="resistencia_muscular">Resistência muscular</option>
-          </select>
         </div>
 
         <button
           onClick={handleAnalisar}
-          disabled={loading || treinos.length === 0}
+          disabled={loading || treinos.length === 0 || selectedId === null}
           className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
         >
           {loading ? (
@@ -302,7 +249,7 @@ export default function IAOptimezeSection() {
           ) : (
             <>
               <span className="material-icons text-sm">auto_awesome</span>
-              Analisar treinos
+              Analisar treino
             </>
           )}
         </button>
@@ -323,29 +270,21 @@ export default function IAOptimezeSection() {
 
         {treinos.length > 0 && (
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
-            {Array.isArray(treinos) &&
-              treinos.map((treino) => (
-                <li
-                  key={treino.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
-                    selectedIds.includes(treino.id)
-                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-500/20"
-                      : "border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                  }`}
-                  onClick={() => handleToggle(treino.id)}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(treino.id)}
-                    onChange={() => handleToggle(treino.id)}
-                    className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
-                    {treino.nome}
-                  </span>
-                </li>
-              ))}
+            {treinos.map((treino) => (
+              <li
+                key={treino.id}
+                className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                  selectedId === treino.id
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-500/20"
+                    : "border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                }`}
+                onClick={() => handleSelectTreino(treino.id)}
+              >
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
+                  {treino.nome}
+                </span>
+              </li>
+            ))}
           </ul>
         )}
       </div>
@@ -473,34 +412,6 @@ export default function IAOptimezeSection() {
                   </li>
                 ))}
               </ul>
-            </section>
-          )}
-
-          {/* Recomendações */}
-          {relatorio.recomendacoes?.length > 0 && (
-            <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 px-1">
-                Recomendações
-              </h3>
-              {(relatorio.recomendacoes || [])
-                .slice()
-                .sort((a, b) => {
-                  const ordem = { Alta: 0, Média: 1, Baixa: 2 };
-                  return ordem[a.prioridade] - ordem[b.prioridade];
-                })
-                .map((r, idx) => (
-                  <div
-                    key={idx}
-                    className={`border-l-4 rounded-xl p-3 text-sm ${CORES_PRIORIDADE[r.prioridade]}`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-semibold">{r.problema}</span>
-                      <span className="text-xs uppercase tracking-wide opacity-70">{r.prioridade}</span>
-                    </div>
-                    <p className="mb-1">{renderTextoComLinks(r.recomendacao)}</p>
-                    <p className="text-xs opacity-80">{r.justificativa}</p>
-                  </div>
-                ))}
             </section>
           )}
 
