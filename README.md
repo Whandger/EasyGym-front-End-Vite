@@ -2,12 +2,7 @@
 
 > Uma aplicação web Full Stack para gerenciamento de treinos, desenvolvida como MVP para a disciplina de Desenvolvimento Web da PUC-Rio.
 
-![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Acadêmico-success?style=for-the-badge)
+![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white) ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white) ![Status](https://img.shields.io/badge/Status-Ativo%C3%A9-success?style=for-the-badge)
 
 ---
 
@@ -17,7 +12,7 @@ O **EasyGym** é uma aplicação **Full Stack** desenvolvida como projeto da dis
 
 O sistema permite que usuários criem, acompanhem e analisem seus treinos por meio de uma interface moderna desenvolvida em **React + TypeScript**, consumindo uma API REST construída com **FastAPI**.
 
-A aplicação oferece autenticação JWT, gerenciamento completo de treinos, histórico de atividades, estatísticas e configurações de perfil, com persistência em banco de dados.
+A aplicação oferece autenticação JWT, gerenciamento completo de treinos, histórico de atividades, estatísticas, geração de dicas de treino por IA e configurações de perfil, com persistência em banco de dados.
 
 ---
 
@@ -25,11 +20,11 @@ A aplicação oferece autenticação JWT, gerenciamento completo de treinos, his
 
 ### Frontend
 
-https://whandger.github.io/PUC-Rio-MVP-front-End-Vite/#/
+<https://whandger.github.io/EasyGym-front-End-Vite/#/>
 
 ### Backend
 
-https://github.com/whandger/PUC-Rio-MVP-back-End-FastApi
+<https://github.com/Whandger/EasyGym-back-End-FastApi>
 
 > **Observação**
 >
@@ -103,6 +98,14 @@ https://github.com/whandger/PUC-Rio-MVP-back-End-FastApi
 
 ---
 
+## 🤖 Dicas de treino por IA
+
+- Seleção de um ou mais treinos para análise
+- Geração de dicas, pontos de atenção e evolução de carga via LLM (Groq), consumido pelo backend
+- Sugestão de exercícios complementares do catálogo com justificativa
+
+---
+
 ## 👤 Conta
 
 - Alteração de nome
@@ -145,6 +148,7 @@ https://github.com/whandger/PUC-Rio-MVP-back-End-FastApi
 - Passlib
 - Pydantic v2
 - Uvicorn
+- Groq API (LLM externo para geração de dicas)
 
 ---
 
@@ -161,37 +165,37 @@ Opcionalmente:
 
 Clone o projeto:
 
-```bash
-git clone https://github.com/whandger/PUC-Rio-MVP-front-End-Vite.git
+```
+git clone https://github.com/Whandger/EasyGym-front-End-Vite.git
 ```
 
 Entre na pasta:
 
-```bash
-cd PUC-Rio-MVP-front-End-Vite
+```
+cd EasyGym-front-End-Vite
 ```
 
 Instale as dependências:
 
-```bash
+```
 npm install
 ```
 
 Crie o arquivo `.env`:
 
-```bash
+```
 cp .env.example .env
 ```
 
 Configure a URL da API:
 
-```env
+```
 VITE_API_URL=http://localhost:8000
 ```
 
 Execute o projeto:
 
-```bash
+```
 npm run dev
 ```
 
@@ -236,7 +240,7 @@ A aplicação utiliza um cliente Axios responsável por:
 - tratar erros de requisição;
 - centralizar toda a comunicação HTTP.
 
-Todos os dados da aplicação são persistidos através da API REST.
+Todos os dados da aplicação são persistidos através da API REST. A funcionalidade de dicas de treino (`/ai/dicas`) é intermediada pelo backend, que consulta a Groq API — o frontend nunca chama o serviço externo diretamente.
 
 ---
 
@@ -253,10 +257,10 @@ Durante o desenvolvimento é possível:
 
 # 📚 Repositórios
 
-| Projeto | Link |
-|----------|------|
-| Frontend | https://github.com/whandger/PUC-Rio-MVP-front-End-Vite |
-| Backend | https://github.com/whandger/PUC-Rio-MVP-back-End-FastApi |
+| Projeto  | Link                                                       |
+| -------- | ---------------------------------------------------------- |
+| Frontend | <https://github.com/Whandger/EasyGym-front-End-Vite>   |
+| Backend  | <https://github.com/Whandger/EasyGym-back-End-FastApi> |
 
 ---
 
@@ -268,13 +272,6 @@ Projeto desenvolvido para fins acadêmicos.
 
 # 👨‍💻 Autor
 
-**Whandger Wolf**
+**Whandger Wolffenbüttel**
 
-GitHub:
-https://github.com/whandger
-
----
-
-<p align="center">
-Desenvolvido com ❤️ utilizando React, TypeScript, Vite e FastAPI.
-</p>
+GitHub: <https://github.com/Whandger>
